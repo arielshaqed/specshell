@@ -10,14 +10,35 @@ export interface Output {
   err: Buffer;
 }
 
-export class Exit {
-  constructor(public code: number) {}
+export interface Exit {
+  exitCode?: number;
+}
+
+export interface Signal {
+  signal?: string;
+}
+
+export class ShellError extends Error implements Exit, Signal {
+  public readonly exitCode?: number;
+  public readonly signal?: string;
+
+  constructor(err?: Error, exitCode?: number | null, signal?: string | null) {
+    super(`shell exit: ${ShellError.message(err, exitCode, signal)}`);
+    if (typeof exitCode === 'number') this.exitCode = exitCode;
+    if (typeof signal === 'string') this.signal = signal;
+  }
+
+  private static message(err?: Error, exitCode?: number | null, signal?: string | null) {
+    if (err) return err.message;
+    if (typeof signal === 'string') return `received signal ${signal}`;
+    return `exited with code ${exitCode}`;
+  }
 }
 
 export class Shell {
   protected readonly mutex = new Mutex();
   private readonly outputters: { out: NextBuffer, err: NextBuffer };
-  private readonly exit= new Mailbox<Exit>();
+  private readonly shellExit = new Mailbox<ShellError>();
   protected readonly shell: child_process.ChildProcess;
   protected readonly delimiter = nanoid();
 
@@ -31,8 +52,8 @@ export class Shell {
       out: delimit(this.shell.stdout!, this.delimiter),
       err: delimit(this.shell.stderr!, this.delimiter),
     };
-    this.shell.on('error', (_err) => this.exit.resolve(new Exit(-1)));
-    this.shell.on('exit', (code, signal) => this.exit.resolve(new Exit(code || -(signal || 0))));
+    this.shell.on('error', (err: Error) => this.shellExit.resolve(new ShellError(err)));
+    this.shell.on('exit', (code, signal) => this.shellExit.resolve(new ShellError(undefined, code, signal)));
   }
 
   // Sends a string into the shell.
@@ -41,12 +62,13 @@ export class Shell {
   }
 
   // Passes script into shell, returns output and error
-  public async run(script: string): Promise<Output | Exit> {
+  public async run(script: string): Promise<Output> {
     this.send(`${script}\necho -n ${this.delimiter}\necho -n 1>&2 ${this.delimiter}\n`);
-    const result: Exit | [Buffer, Buffer] = await Promise.race(
-      [this.exit, Promise.all([this.outputters.out.next(), this.outputters.err.next()])]
+    const result: Error | [Buffer, Buffer] = await Promise.race(
+      [this.shellExit, Promise.all([this.outputters.out.next(), this.outputters.err.next()])]
     );
     
-    return result instanceof Exit ? result : { out: result[0], err: result[1] };
+    if (result instanceof Error) throw result;
+    return { out: result[0], err: result[1] };
   }
 }
