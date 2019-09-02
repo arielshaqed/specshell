@@ -1,0 +1,39 @@
+{
+  "name": "specshell",
+  "version": "0.0.1",
+  "description": "Control a program (typically a shell) over standard I/O for testing it",
+  "main": "index.js",
+  "scripts": {
+    "test": "ava -- dist/test/**.js"
+  },
+  "keywords": [
+    "interact",
+    "spec",
+    "specification",
+    "shell",
+    "standard error",
+    "standard input",
+    "standard output",
+    "stderr",
+    "stdin",
+    "stdout",
+    "stdio",
+    "testing",
+    "test"
+  ],
+  "author": "Ariel Shaqed (Scolnicov)",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/nanoid": "^2.0.0",
+    "@types/node": "^12.7.3",
+    "@types/stream-buffers": "^3.0.3",
+    "ava": "^2.3.0",
+    "typescript": "^3.6.2"
+  },
+  "dependencies": {
+    "async-mutex": "^0.1.3",
+    "nanoid": "^2.1.0",
+    "stream-buffers": "^3.0.2",
+    "streamsearch": "^0.1.2"
+  }
+}
