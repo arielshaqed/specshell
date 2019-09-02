@@ -2,8 +2,11 @@ import nanoid = require('nanoid');
 import { delimit, NextBuffer } from './delimited-stream';
 import { Mailbox } from './promise-next';
 import { Mutex } from 'async-mutex';
-
+import * as os from 'os';
 import * as child_process from 'child_process';
+import { invertObj } from 'ramda';
+
+const signalName = invertObj(os.constants.signals);
 
 export interface Output {
   out: Buffer;
@@ -62,13 +65,20 @@ export class Shell {
   }
 
   // Passes script into shell, returns output and error
-  public async run(script: string): Promise<Output> {
-    this.send(`${script}\necho -n ${this.delimiter}\necho -n 1>&2 ${this.delimiter}\n`);
-    const result: Error | [Buffer, Buffer] = await Promise.race(
-      [this.shellExit, Promise.all([this.outputters.out.next(), this.outputters.err.next()])]
+  public async run(script: string): Promise<Output & (Exit | Signal)> {
+    // run script, then write delimiter to stdout, and
+    // <delimiter><exit code><delimiter> to stderr.
+    this.send(`${script}\necho -n 1>&2 ${this.delimiter}$?${this.delimiter}\necho -n ${this.delimiter}\n`);
+    const result: Error | [Buffer, Buffer, Buffer] = await Promise.race(
+      [this.shellExit,
+       Promise.all([this.outputters.out.next(), this.outputters.err.next(), this.outputters.err.next()])]
     );
-    
     if (result instanceof Error) throw result;
-    return { out: result[0], err: result[1] };
+    const exitStatus = Number.parseInt(result[2].toString(), 10);
+    const exitCode = exitStatus < 128 ? exitStatus : undefined;
+    const signal = exitStatus >= 128 ?
+      (signalName[exitStatus - 128] || (exitStatus - 128).toString()) :
+      undefined;
+    return { out: result[0], err: result[1], exitCode, signal };
   }
 }

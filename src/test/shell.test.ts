@@ -1,5 +1,5 @@
 import test from 'ava';
-import { evolve } from 'ramda';
+import { evolve, pick } from 'ramda';
 
 import { Shell, ShellError } from '../shell';
 
@@ -40,13 +40,27 @@ test('shell returns both together', async (t) => {
   t.assert(err.toString() === 'bar\n');
 });
 
-test('shell raises exception on exit', async (t) => {
+const exitSignal = pick(['exitCode', 'signal']);
+
+test('shell reports exit status', async (t) => {
+  const shell = new Shell();
+  const ret = exitSignal(await shell.run('(exit 17)'));
+  t.deepEqual(ret, { exitCode: 17, signal: undefined });
+});
+
+test('shell reports signal', async (t) => {
+  const shell = new Shell();
+  const ret = exitSignal(await shell.run('sh -c \'kill -USR1 $$\''));
+  t.deepEqual(ret, { signal: 'SIGUSR1', exitCode: undefined });
+});
+
+test('shell raises exception when its shell exits', async (t) => {
   const shell = new Shell();
   const error: ShellError = await t.throwsAsync(shell.run('exit 17'), ShellError);
   t.assert(error.exitCode === 17);
 });
 
-test('shell raises exception on sudden death', async (t) => {
+test('shell raises exception when its shell dies', async (t) => {
   const shell = new Shell();
   const error: ShellError = await t.throwsAsync(shell.run('kill -TERM $$'), ShellError);
   t.assert(error.signal === 'SIGTERM');
