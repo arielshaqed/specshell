@@ -18,6 +18,7 @@
     "stdin",
     "stdout",
     "stdio",
+    "shell",
     "testing",
     "test"
   ],
