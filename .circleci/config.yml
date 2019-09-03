@@ -43,4 +43,15 @@ jobs:
       - <<: *attach_workspace
       - run:
           name: Run tests
-          command: node common/scripts/install-run-rush.js test --verbose
+          command: npm run test
+workflows:
+  version: 2
+  commit:
+    jobs:
+      - build: {}
+      - lint:
+          requires:
+            - build
+      - test:
+          requires:
+            - build
