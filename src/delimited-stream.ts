@@ -12,13 +12,13 @@ export type NextBuffer = PromiseNext<Buffer>;
 export function delimit(inputStream: Readable, delimiter: string): NextBuffer {
   const searcher = new StreamSearch(delimiter);
 
-  const ret = new PromiseNext<Buffer>();
+  const resultQueue = new PromiseNext<Buffer>();
 
   let bufs: Buffer[] = [];
   searcher.on('info', (isMatch: boolean, data: Buffer | null, start: number, end: number) => {
     if (data) bufs.push(data.subarray(start, end));
     if (isMatch) {
-      ret.push(Buffer.concat(bufs));
+      resultQueue.push(Buffer.concat(bufs));
       bufs = [];
     }
   });
@@ -26,5 +26,5 @@ export function delimit(inputStream: Readable, delimiter: string): NextBuffer {
   inputStream.on('data',
                  (chunk) => searcher.push(chunk instanceof Buffer ? chunk : Buffer.from(chunk)));
 
-  return ret;
+  return resultQueue;
 }
