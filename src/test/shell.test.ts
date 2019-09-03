@@ -22,7 +22,6 @@ test('shell returns standard outputs with incomplete lines', async (t) => {
   t.assert(err.toString() === '');
 });
 
-
 test('shell returns standard errors', async (t) => {
   const shell = new Shell();
   const { out, err } = process(await shell.run('1>&2 echo foo; 1>&2 echo -n bar\n'));
