@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "build": "tsc",
+    "lint": "tslint -p .",
     "test": "ava -- dist/test/**.js"
   },
   "keywords": [
