@@ -1,13 +1,18 @@
 {
   "name": "specshell",
-  "version": "0.0.1",
+  "version": "0.0.1-rc.0",
   "description": "Control a program (typically a shell) over standard I/O for testing it",
-  "main": "index.js",
+  "main": "dist/shell.js",
   "scripts": {
     "build": "tsc",
     "lint": "tslint -p .",
     "test": "ava -- dist/test/**.js"
   },
+  "files": [
+    "dist/",
+    "package.json"
+  ],
+  "repository": "github:binaris/specshell",
   "keywords": [
     "interact",
     "spec",
