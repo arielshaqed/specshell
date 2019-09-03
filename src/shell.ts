@@ -14,14 +14,19 @@ export interface Output {
 }
 
 export interface Exit {
-  exitCode?: number;
+  exitCode: number;
 }
 
 export interface Signal {
-  signal?: string;
+  signal: string;
 }
 
-export class ShellError extends Error implements Exit, Signal {
+// Returns true if called on a successful output
+export function success(out: { exitCode?: number; signal?: string }) {
+  return !((out as Exit).exitCode || (out as Signal).signal);
+}
+
+export class ShellError extends Error {
   public readonly exitCode?: number;
   public readonly signal?: string;
 
@@ -75,10 +80,9 @@ export class Shell {
     );
     if (result instanceof Error) throw result;
     const exitStatus = Number.parseInt(result[2].toString(), 10);
-    const exitCode = exitStatus < 128 ? exitStatus : undefined;
-    const signal = exitStatus >= 128 ?
-      (signalName[exitStatus - 128] || (exitStatus - 128).toString()) :
-      undefined;
-    return { out: result[0], err: result[1], exitCode, signal };
+    const status: Exit | Signal = exitStatus <= 128 ?
+      { exitCode: exitStatus } :
+    { signal: signalName[exitStatus - 128] || (exitStatus - 128).toString() };
+    return { out: result[0], err: result[1], ...status };
   }
 }
