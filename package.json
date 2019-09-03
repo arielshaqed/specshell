@@ -27,6 +27,7 @@
   "author": "Ariel Shaqed (Scolnicov)",
   "license": "MIT",
   "devDependencies": {
+    "@types/defer-promise": "^1.0.0",
     "@types/nanoid": "^2.0.0",
     "@types/node": "^12.7.3",
     "@types/ramda": "^0.26.21",
@@ -38,6 +39,7 @@
   },
   "dependencies": {
     "async-mutex": "^0.1.3",
+    "defer-promise": "^2.0.1",
     "nanoid": "^2.1.0",
     "stream-buffers": "^3.0.2",
     "streamsearch": "^0.1.2"
