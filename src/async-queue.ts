@@ -1,6 +1,6 @@
 import defer = require('defer-promise');
 
-export class PromiseNext<T> {
+export class AsyncQueue<T> {
   protected query: Array<DeferPromise.Deferred<T>> = [];
   protected queue: T[] = [];
 
@@ -9,7 +9,7 @@ export class PromiseNext<T> {
     this.queue.push(t);
   }
 
-  public async next(): Promise<T> {
+  public async pull(): Promise<T> {
     if (this.queue.length > 0) return this.queue.shift()!;
     const wait = defer<T>();
     this.query.push(wait);
