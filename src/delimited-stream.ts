@@ -15,7 +15,7 @@ export function delimit(inputStream: Readable, delimiter: string): NextBuffer {
   const ret = new PromiseNext<Buffer>();
 
   let bufs: Buffer[] = [];
-  searcher.on('info', (isMatch: boolean, data: Buffer, start: number, end: number) => {
+  searcher.on('info', (isMatch: boolean, data: Buffer | null, start: number, end: number) => {
     if (data) bufs.push(data.subarray(start, end));
     if (isMatch) {
       ret.push(Buffer.concat(bufs));
