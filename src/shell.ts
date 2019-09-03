@@ -1,5 +1,5 @@
 import nanoid = require('nanoid');
-import { delimit, NextBuffer } from './delimited-stream';
+import { delimit, BufferQueue } from './delimited-stream';
 import defer = require('defer-promise');
 import { Mutex } from 'async-mutex';
 import * as os from 'os';
@@ -40,7 +40,7 @@ export class ShellError extends Error implements Exit, Signal {
 
 export class Shell {
   protected readonly mutex = new Mutex();
-  private readonly outputters: { out: NextBuffer, err: NextBuffer };
+  private readonly outputters: { out: BufferQueue, err: BufferQueue };
   private readonly shellExit = defer<ShellError>();
   protected readonly shell: child_process.ChildProcess;
   protected readonly delimiter = nanoid();
@@ -71,7 +71,7 @@ export class Shell {
     this.send(`${script}\necho -n 1>&2 ${this.delimiter}$?${this.delimiter}\necho -n ${this.delimiter}\n`);
     const result: Error | [Buffer, Buffer, Buffer] = await Promise.race(
       [this.shellExit.promise,
-       Promise.all([this.outputters.out.next(), this.outputters.err.next(), this.outputters.err.next()])]
+       Promise.all([this.outputters.out.pull(), this.outputters.err.pull(), this.outputters.err.pull()])]
     );
     if (result instanceof Error) throw result;
     const exitStatus = Number.parseInt(result[2].toString(), 10);

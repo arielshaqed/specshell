@@ -1,5 +1,5 @@
 import StreamSearch = require('streamsearch');
-import { PromiseNext } from './promise-next';
+import { AsyncQueue } from './async-queue';
 
 export type ReadCallback = (chunk: ArrayBuffer | SharedArrayBuffer) => any;
 
@@ -7,12 +7,12 @@ export interface Readable {
   on(event: 'data', callback: ReadCallback): any;
 }
 
-export type NextBuffer = PromiseNext<Buffer>;
+export type BufferQueue = AsyncQueue<Buffer>;
 
-export function delimit(inputStream: Readable, delimiter: string): NextBuffer {
+export function delimit(inputStream: Readable, delimiter: string): BufferQueue {
   const searcher = new StreamSearch(delimiter);
 
-  const resultQueue = new PromiseNext<Buffer>();
+  const resultQueue = new AsyncQueue<Buffer>();
 
   let bufs: Buffer[] = [];
   searcher.on('info', (isMatch: boolean, data: Buffer | null, start: number, end: number) => {

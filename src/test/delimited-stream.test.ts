@@ -9,7 +9,7 @@ test('delimit returns first buffer', async (t) => {
   const output = delimit(input, delimiter);
 
   input.emit('data', `12345${delimiter}678`);
-  t.assert((await output.next()).toString('utf8') === '12345');
+  t.assert((await output.pull()).toString('utf8') === '12345');
 });
 
 test('delimit returns multiple buffers', async (t) => {
@@ -17,8 +17,8 @@ test('delimit returns multiple buffers', async (t) => {
   const output = delimit(input, delimiter);
 
   input.emit('data', `12345${delimiter}678${delimiter}`);
-  t.assert((await output.next()).toString('utf8') === '12345');
-  t.assert((await output.next()).toString('utf8') === '678');
+  t.assert((await output.pull()).toString('utf8') === '12345');
+  t.assert((await output.pull()).toString('utf8') === '678');
 });
 
 test('delimit handles near-delimiters', async (t) => {
@@ -26,8 +26,8 @@ test('delimit handles near-delimiters', async (t) => {
   const output = delimit(input, delimiter);
 
   input.emit('data', `xyz${delimiter}yzzy${delimiter}`);
-  t.assert((await output.next()).toString('utf8') === 'xyz');
-  t.assert((await output.next()).toString('utf8') === 'yzzy');
+  t.assert((await output.pull()).toString('utf8') === 'xyz');
+  t.assert((await output.pull()).toString('utf8') === 'yzzy');
 });
 
 test('delimit returns buffer split across chunks', async (t) => {
@@ -36,7 +36,7 @@ test('delimit returns buffer split across chunks', async (t) => {
 
   input.emit('data', '1234');
   input.emit('data', `5${delimiter}678`);
-  t.assert((await output.next()).toString('utf8') === '12345');
+  t.assert((await output.pull()).toString('utf8') === '12345');
 });
 
 // (Really a streamsearch test, but we're making sure it can be called
@@ -49,5 +49,5 @@ test('delimit returns buffer when delimit is split across chunks', async (t) => 
 
   input.emit('data', `12345${d1}`);
   input.emit('data', `${d2}678`);
-  t.assert((await output.next()).toString('utf8') === '12345');
+  t.assert((await output.pull()).toString('utf8') === '12345');
 });
