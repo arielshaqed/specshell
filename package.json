@@ -7,7 +7,7 @@
     "build": "tsc",
     "lint": "tslint -p .",
     "test": "ava -- dist/test/**.js",
-    "prepublishOnly": "rm -rf dist/ && npm run build"
+    "prepublishOnly": "rm -rf dist/ && npm run build && npm test && npm run lint"
   },
   "files": [
     "dist/",
