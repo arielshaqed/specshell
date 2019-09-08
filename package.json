@@ -1,12 +1,13 @@
 {
   "name": "specshell",
-  "version": "0.0.1-rc.0",
+  "version": "0.0.1",
   "description": "Control a program (typically a shell) over standard I/O for testing it",
   "main": "dist/shell.js",
   "scripts": {
     "build": "tsc",
     "lint": "tslint -p .",
-    "test": "ava -- dist/test/**.js"
+    "test": "ava -- dist/test/**.js",
+    "prepublishOnly": "rm -rf dist/ && npm run build"
   },
   "files": [
     "dist/",
