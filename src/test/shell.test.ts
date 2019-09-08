@@ -71,3 +71,10 @@ test('shell raises exception when its shell dies', async (t) => {
   t.is(error.signal, 'SIGTERM');
   t.false(success(error));
 });
+
+test('shell decodes stdio if passed encoding', async (t) => {
+  const shell = new Shell();
+  const { out, err } = await shell.run('echo -n hey ho; echo -n lets go 1>&2', 'utf8');
+  t.is(out, 'hey ho');
+  t.is(err, 'lets go');
+});

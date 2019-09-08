@@ -8,9 +8,9 @@ import { invertObj } from 'ramda';
 
 const signalName = invertObj(os.constants.signals);
 
-export interface Output {
-  out: Buffer;
-  err: Buffer;
+export interface Output<T> {
+  out: T;
+  err: T;
 }
 
 export interface Exit {
@@ -69,8 +69,11 @@ export class Shell {
     this.shell.stdin!.write(s);
   }
 
+  public async run(script: string): Promise<Output<Buffer> & (Exit | Signal)>;
+  public async run(script: string, encoding: string): Promise<Output<string> & (Exit | Signal)>;
+
   // Passes script into shell, returns output and error
-  public async run(script: string): Promise<Output & (Exit | Signal)> {
+  public async run(script: string, encoding?: string): Promise<Output<any> & (Exit | Signal)> {
     // run script, then write delimiter to stdout, and
     // <delimiter><exit code><delimiter> to stderr.
     this.send(`${script}\necho -n 1>&2 ${this.delimiter}$?${this.delimiter}\necho -n ${this.delimiter}\n`);
@@ -83,6 +86,9 @@ export class Shell {
     const status: Exit | Signal = exitStatus <= 128 ?
       { exitCode: exitStatus } :
     { signal: signalName[exitStatus - 128] || (exitStatus - 128).toString() };
+    if (encoding !== undefined) {
+      return { out: result[0].toString(encoding), err: result[1].toString(encoding), ...status };
+    }
     return { out: result[0], err: result[1], ...status };
   }
 }
