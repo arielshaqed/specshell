@@ -73,7 +73,7 @@ export class Shell {
   public async run(script: string, encoding: string): Promise<Output<string> & (Exit | Signal)>;
 
   // Passes script into shell, returns output and error
-  public async run(script: string, encoding?: string): Promise<Output<any> & (Exit | Signal)> {
+  public async run(script: string, encoding?: string): Promise<Output<Buffer | string> & (Exit | Signal)> {
     // run script, then write delimiter to stdout, and
     // <delimiter><exit code><delimiter> to stderr.
     this.send(`${script}\necho -n 1>&2 ${this.delimiter}$?${this.delimiter}\necho -n ${this.delimiter}\n`);
