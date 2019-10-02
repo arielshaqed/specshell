@@ -1,16 +1,16 @@
 {
   "name": "specshell",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Control a program (typically a shell) over standard I/O for testing it",
-  "main": "dist/shell.js",
+  "main": "dist/main/shell.js",
   "scripts": {
-    "build": "tsc",
+    "build": "tsc -b",
     "lint": "tslint -p .",
     "test": "ava -- dist/test/**.js",
     "prepublishOnly": "rm -rf dist/ && npm run build && npm test && npm run lint"
   },
   "files": [
-    "dist/",
+    "dist/main",
     "package.json"
   ],
   "repository": "github:binaris/specshell",

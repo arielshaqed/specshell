@@ -1,7 +1,7 @@
 import test from 'ava';
 import { pick } from 'ramda';
 
-import { Shell, ShellError, success } from '../shell';
+import { Shell, ShellError, success } from '../main/shell';
 
 test('shell returns standard outputs', async (t) => {
   const shell = new Shell();
