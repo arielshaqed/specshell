@@ -1,4 +1,4 @@
-import { AsyncQueue } from '../async-queue';
+import { AsyncQueue } from '../main/async-queue';
 import test from 'ava';
 
 test('AsyncQueue returns old data', async (t) => {

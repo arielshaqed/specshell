@@ -1,4 +1,4 @@
-import { delimit } from '../delimited-stream';
+import { delimit } from '../main/delimited-stream';
 import { EventEmitter } from 'events';
 import test from 'ava';
 
