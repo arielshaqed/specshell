@@ -1,3 +1,4 @@
+[![Build status](https://github.com/binaris/specshell/workflows/Node%20CI/badge.svg)](https://github.com/binaris/specshell/actions)
 # specshell
 
 Write JavaScript specs for shell commands
