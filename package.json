@@ -1,6 +1,6 @@
 {
   "name": "specshell",
-  "version": "0.0.3",
+  "version": "0.1.0",
   "description": "Control a program (typically a shell) over standard I/O for testing it",
   "main": "dist/main/shell.js",
   "scripts": {
